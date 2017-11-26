@@ -126,8 +126,6 @@
                             "productImage":"Yeelight床头灯.jpg"
                         }
                     ]
-
-
             }
         } ,
         components:{
