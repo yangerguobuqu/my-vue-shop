@@ -15,9 +15,14 @@
                     <div class="filter" id="filter">
                         <dl class="filter-price">
                             <dt>价格区间:</dt>
-                            <dd><a href="javascript:void(0)">选择价格</a></dd>
-                            <dd>
-                                <a href="javascript:void(0)">￥ 0 - 100 元</a>
+                            <dd><a href="javascript:void(0)"
+                                   class="cur">选择价格</a></dd>
+                            <dd v-for="(item,index) in priceFilter">
+                                <a href="javascript:void(0)"
+                                   @click=setPriceFilter(index)
+                                   :class="{'cur':priceChecked == index}">
+                                    ￥ {{ item.startPrice.toFixed(2)}} -  {{ item.endPrice.toFixed(2)}} 元
+                                </a>
                             </dd>
                         </dl>
                     </div>
@@ -64,7 +69,14 @@
         name: 'GoodList',
         data (){
             return {
-                goodsList:[]
+                goodsList:[],
+                priceFilter:[
+                    {startPrice:0.00,endPrice:100.00},
+                    {startPrice:100.00,endPrice:200.00},
+                    {startPrice:200.00,endPrice:500.00},
+                    {startPrice:500.00,endPrice:1000.00}
+                ],
+                priceChecked:''
             }
         } ,
         components:{
@@ -78,12 +90,15 @@
         methods:{
             getGoodsList(){
                 axios.get("/goods").then((res)=>{
-                    console.log(res.data);
+
                     this.goodsList = res.data;
-                    console.log(this);
+
                 }).catch((err)=>{
                     console.log(err)
                 })
+            },
+            setPriceFilter(index){
+                this.priceChecked = index;
             }
         }
     }
