@@ -32,10 +32,10 @@
                     <div class="accessory-list-wrap">
                         <div class="accessory-list col-4">
                             <ul>
-                                <li v-for="item in goodsList.result">
+                                <li v-for="item in goodsList">
                                     <div class="pic">
                                         <a href="#">
-                                            <img :src="'/static/'+item.productImage" alt="">
+                                            <img v-lazy="'/static/'+item.productImage" alt="">
                                         </a>
                                     </div>
                                     <div class="main">
@@ -52,6 +52,8 @@
                 </div>
             </div>
         </div>
+        <!-- 遮罩层 -->
+        <div class="md-overlay" v-show="overLayFlag" @click.stop="closePop"></div>
         <nav-footer></nav-footer>
 
     </div>
@@ -66,6 +68,7 @@
     import axios from "axios";
 
 
+
     export default {
         name: 'GoodList',
         data (){
@@ -78,7 +81,8 @@
                     {startPrice:500.00,endPrice:1000.00}
                 ],
                 priceChecked:'',
-                filterBy:false
+                filterBy:false,
+                overLayFlag:false
             }
         } ,
         components:{
@@ -92,8 +96,8 @@
         methods:{
             getGoodsList(){
                 axios.get("/goods").then((res)=>{
-
-                    this.goodsList = res.data;
+                    console.log(res.data.result.list)
+                    this.goodsList = res.data.result.list;
 
                 }).catch((err)=>{
                     console.log(err)
@@ -104,6 +108,11 @@
             },
             showFilterPop(){
                 this.filterBy = true;
+                this.overLayFlag = true;
+            },
+            closePop(){
+                this.overLayFlag = false;
+                this.filterBy = false
             }
         }
     }
