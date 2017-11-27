@@ -8,11 +8,12 @@
                     <span class="sortby">排序:</span>
                     <a href="javascript:void(0)" class="default cur">默认</a>
                     <a href="javascript:void(0)" class="price">价格 <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
-                    <a href="javascript:void(0)" class="filterby">筛选</a>
+                    <a href="javascript:void(0)" class="filterby"
+                       @click.stop="showFilterPop">筛选</a>
                 </div>
                 <div class="accessory-result">
                     <!-- filter -->
-                    <div class="filter" id="filter">
+                    <div class="filter" id="filter" :class="{'filterby-show':filterBy}">
                         <dl class="filter-price">
                             <dt>价格区间:</dt>
                             <dd><a href="javascript:void(0)"
@@ -76,7 +77,8 @@
                     {startPrice:200.00,endPrice:500.00},
                     {startPrice:500.00,endPrice:1000.00}
                 ],
-                priceChecked:''
+                priceChecked:'',
+                filterBy:false
             }
         } ,
         components:{
@@ -99,6 +101,9 @@
             },
             setPriceFilter(index){
                 this.priceChecked = index;
+            },
+            showFilterPop(){
+                this.filterBy = true;
             }
         }
     }
