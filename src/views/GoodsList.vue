@@ -6,8 +6,11 @@
             <div class="container">
                 <div class="filter-nav">
                     <span class="sortby">排序:</span>
-                    <a href="javascript:void(0)" class="default cur">默认</a>
-                    <a href="javascript:void(0)" class="price">价格 <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
+                    <a href="javascript:void(0)" class="default cur" @click="defaultSort">默认</a>
+                    <a href="javascript:void(0)"
+                       class="price"
+                       @click="sortGoods"
+                       :class="{'sort-up':sortFlag}">价格 <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
                     <a href="javascript:void(0)" class="filterby"
                        @click.stop="showFilterPop">筛选</a>
                 </div>
@@ -48,6 +51,12 @@
                                 </li>
                             </ul>
                         </div>
+                        <div v-infinite-scroll="loadMore"
+                             infinite-scroll-disabled="busy"
+                             infinite-scroll-distance="20"
+                             class="view-more-normal">
+                            <img src="/static/loading-svg/loading-spinning-bubbles.svg" v-show="loading">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,9 +75,7 @@
     import "../assets/css/base.css"
     import "../assets/css/goods-list.css"
     import axios from "axios";
-
-
-
+    import infiniteScroll from 'vue-infinite-scroll';
     export default {
         name: 'GoodList',
         data (){
@@ -85,7 +92,9 @@
                 overLayFlag:false,
                 page:1,
                 pageSize:8,
-                sortFlag:1
+                sortFlag:true,
+                busy:true,
+                loading:false
             }
         } ,
         components:{
@@ -97,21 +106,48 @@
             this.getGoodsList();
         },
         methods:{
-            getGoodsList(){
+            getGoodsList(flag){
                 var params = {
                     page:this.page,
                     pageSize:this.pageSize,
-                    sort:this.sortFlag
+                    sort:this.sortFlag ? 1 : -1
                 }
+                this.loading = true;
                 axios.get("http://127.0.0.1:3000/goods/",{
                     params:params
                 }).then((res)=>{
-                    console.log(res.data.result.list)
-                    this.goodsList = res.data.result.list;
+                    var myData = res.data
+                    console.log(myData);
+                    this.loading = false;
+                    if(myData.status == "0"){
+                        if(flag){
+                            this.goodsList = this.goodsList.concat(myData.result.list);
+                            if(myData.result.count==0){
+                                this.busy = true;
+                            }else{
+                                this.busy = false;
+                            }
+                        }else{
+                            this.goodsList = myData.result.list;
+                            this.busy = false;
+                        }
+                    }else{
+                        this.goodsList = [];
+                    }
 
                 }).catch((err)=>{
                     console.log(err)
                 })
+            },
+            defaultSort(){
+                this.sortFlag = true;
+                this.page = 1;
+                this.getGoodsList()
+            },
+            sortGoods(){
+                this.sortFlag = !this.sortFlag;
+                this.page = 1;
+                this.getGoodsList()
             },
             setPriceFilter(index){
                 this.priceChecked = index;
@@ -123,7 +159,16 @@
             closePop(){
                 this.overLayFlag = false;
                 this.filterBy = false
+            },
+            loadMore(){
+                console.log("loadMore")
+                this.busy = true;
+                setTimeout(() => {
+                    this.page++;
+                    this.getGoodsList(true);
+                }, 500)
             }
+
         }
     }
 
