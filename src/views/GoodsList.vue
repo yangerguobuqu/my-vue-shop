@@ -82,7 +82,10 @@
                 ],
                 priceChecked:'',
                 filterBy:false,
-                overLayFlag:false
+                overLayFlag:false,
+                page:1,
+                pageSize:8,
+                sortFlag:1
             }
         } ,
         components:{
@@ -95,7 +98,14 @@
         },
         methods:{
             getGoodsList(){
-                axios.get("/goods").then((res)=>{
+                var params = {
+                    page:this.page,
+                    pageSize:this.pageSize,
+                    sort:this.sortFlag
+                }
+                axios.get("http://127.0.0.1:3000/goods/",{
+                    params:params
+                }).then((res)=>{
                     console.log(res.data.result.list)
                     this.goodsList = res.data.result.list;
 
