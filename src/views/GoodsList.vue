@@ -25,7 +25,7 @@
                                 <a href="javascript:void(0)"
                                    @click=setPriceFilter(index)
                                    :class="{'cur':priceChecked == index}">
-                                    ￥ {{ item.startPrice.toFixed(2)}} -  {{ item.endPrice.toFixed(2)}} 元
+                                    ￥{{ item.startPrice }}-{{ item.endPrice }} 元
                                 </a>
                             </dd>
                         </dl>
@@ -45,7 +45,8 @@
                                         <div class="name">{{ item.productName }}</div>
                                         <div class="price">{{ item.salePrice }}</div>
                                         <div class="btn-area">
-                                            <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                                            <a href="javascript:;" class="btn btn--m"
+                                               @click=addCart(item.productId)>加入购物车</a>
                                         </div>
                                     </div>
                                 </li>
@@ -82,12 +83,32 @@
             return {
                 goodsList:[],
                 priceFilter:[
-                    {startPrice:0.00,endPrice:100.00},
-                    {startPrice:100.00,endPrice:200.00},
-                    {startPrice:200.00,endPrice:500.00},
-                    {startPrice:500.00,endPrice:1000.00}
+                    {
+                        startPrice:'0.00',
+                        endPrice:'100.00'
+                    },
+                    {
+                        startPrice:'100.00',
+                        endPrice:'500.00'
+                    },
+                    {
+                        startPrice:'500.00',
+                        endPrice:'1000.00'
+                    },
+                    {
+                        startPrice:'1000.00',
+                        endPrice:'2000.00'
+                    },
+                    {
+                        startPrice:'2000.00',
+                        endPrice:'3000.00'
+                    },
+                    {
+                        startPrice:'3000.00',
+                        endPrice:'6000.00'
+                    }
                 ],
-                priceChecked:'',
+                priceChecked:'all',
                 filterBy:false,
                 overLayFlag:false,
                 page:1,
@@ -110,14 +131,15 @@
                 var params = {
                     page:this.page,
                     pageSize:this.pageSize,
-                    sort:this.sortFlag ? 1 : -1
+                    sort:this.sortFlag ? 1 : -1,
+                    priceLevel:this.priceChecked
                 }
                 this.loading = true;
                 axios.get("http://127.0.0.1:3000/goods/",{
                     params:params
                 }).then((res)=>{
                     var myData = res.data
-                    console.log(myData);
+
                     this.loading = false;
                     if(myData.status == "0"){
                         if(flag){
@@ -151,6 +173,8 @@
             },
             setPriceFilter(index){
                 this.priceChecked = index;
+                this.page = 1;
+                this.getGoodsList();
             },
             showFilterPop(){
                 this.filterBy = true;
@@ -167,6 +191,20 @@
                     this.page++;
                     this.getGoodsList(true);
                 }, 500)
+            },
+            addCart(productId){
+                console.log(11);
+                axios.post("/goods/addCart",{
+                    productId:productId
+                }).then((res)=>{
+                    var res = res.data;
+                    console.log(res)
+                    if(res.status == "0"){
+                        alert("添加成功")
+                    }else{
+                        alert(res.msg)
+                    }
+                })
             }
 
         }
@@ -418,6 +456,7 @@
     .filter dd a {
         display: block;
         padding: 5px 0;
+        font-family: "microsoft yahei", sans-serif;
         -webkit-transition: padding-left .3s ease-out;
         transition: padding-left .3s ease-out;
     }
