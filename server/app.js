@@ -26,14 +26,30 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.all("*",function(req,res,next){
-//  CORSÅäÖÃ
+//  CORSé…ç½®
   res.header("Access-Control-Allow-Origin","*");
   res.header("Access-Control-Allow-Headers","Origin,X-Requested-With,Content-Type,Accept");
   res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS");
   res.header("X-Powered-By","3.2.1");
   res.header("Content-Type","application/json;charset=utf-8");
   next();
-})
+});
+app.use(function (req,res,next) {
+  if(req.cookies.userId){
+    next();
+  }else{
+    console.log("url:"+req.originalUrl);
+    if(req.originalUrl=='/users/login' || req.originalUrl=='/users/logout' || req.originalUrl.indexOf('/goods/list')>-1){
+      next();
+    }else{
+      res.json({
+        status:'10001',
+        msg:'å½“å‰æœªç™»å½•',
+        result:''
+      });
+    }
+  }
+});
 app.use('/', index);
 app.use('/goods', goods);
 app.use('/users', users);
